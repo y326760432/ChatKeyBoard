@@ -20,6 +20,7 @@
     YGInputView *view=[YGInputView view];
     view.frame=CGRectMake(0, 100, self.view.frame.size.width, 50);
     [self.view addSubview:view];
+    
 }
 
 @end
