@@ -7,9 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#define kKeyBorad_H 50
 @interface YGInputView : UIView
-@property (weak, nonatomic) IBOutlet UIButton *btnsend;
-@property (weak, nonatomic) IBOutlet UITextField *tfcontent;
 +(YGInputView *)view;
 @end
