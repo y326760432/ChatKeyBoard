@@ -20,15 +20,43 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor=[UIColor whiteColor];
-    
-//    self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-50-64)];
-//    self.tableView.delegate=self;
-//    self.tableView.dataSource=self;
+    self.view.backgroundColor=[UIColor colorWithWhite:0.902 alpha:1.000];
     [self.view addSubview:self.tableView];
-    
     [self addInputView];
+    UITableView *tableview=[[UITableView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-kKeyBorad_H-64)];
+    tableview.delegate=self;
+    tableview.dataSource=self;
+    [self.view addSubview:tableview];
+    self.tableView=tableview;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
 }
+
+
+#pragma mark 监听键盘即将出现通知
+-(void)keyBoardChangeFrame:(NSNotification *)notification
+{
+    NSLog(@"%@",notification.userInfo);
+    //获取动画时长
+    CGFloat duration=[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
+    //获取键盘高度
+    CGFloat keyborad_y=[notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].origin.y ;
+    
+    
+//    NSLog(@"tableframe%@",NSStringFromCGRect(tableframe));
+//     NSLog(@"inputviewframe%@",NSStringFromCGRect(inputviewframe));
+    [UIView animateWithDuration:duration animations:^{
+        CGRect tableframe=self.tableView.frame;
+        CGRect inputviewframe=self.Inputview.frame;
+        tableframe.origin.y=(keyborad_y-kKeyBorad_H-20)-kSELF_VIEW_SIZE.height;
+        self.tableView.frame=tableframe;
+        inputviewframe.origin.y=keyborad_y-kKeyBorad_H-64;
+        self.Inputview.frame=inputviewframe;
+        NSLog(@"%@",NSStringFromCGRect(inputviewframe));
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForItem:19 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+        
+    }];
+}
+
 
 -(void)viewWillAppear:(BOOL)animated
 {
@@ -38,17 +66,24 @@
 
 -(void)addInputView
 {
-    YGInputView *view=[[YGInputView alloc]initWithFrame:CGRectMake(0, 84, kSELF_VIEW_SIZE.width, 50)];
+    YGInputView *view=[[YGInputView alloc]initWithFrame:CGRectMake(0, kSELF_VIEW_SIZE.height-kKeyBorad_H-64, kSELF_VIEW_SIZE.width, kKeyBorad_H)];
+    view.heightChange=^(CGFloat hegiht)
+    {
+        CGRect inputviewframe=self.Inputview.frame;
+        inputviewframe.size.height=hegiht;
+        [self.view layoutSubviews];
+    };
     [self.view addSubview:view];
     self.Inputview=view;
     
 }
 
+
 #pragma mark UITableView代理方法
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 10;
+    return 20;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -61,6 +96,22 @@
     }
     cell.textLabel.text=[NSString stringWithFormat:@"%zd",indexPath.row];
     return cell;
+}
+
+//-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+//{
+//    [self.view endEditing:YES];
+//}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [self.view endEditing:YES];
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.view endEditing:YES];
 }
 
 @end

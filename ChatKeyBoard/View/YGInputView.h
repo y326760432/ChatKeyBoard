@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#define kKeyBorad_H 50
+#define kKeyBorad_H 45
 @interface YGInputView : UIView
 +(YGInputView *)view;
+@property(nonatomic,copy) void(^heightChange)(CGFloat height);
 @end
