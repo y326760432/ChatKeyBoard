@@ -12,6 +12,8 @@
 #define kMarginleft 2
 #define kPanding 5
 #define kItem_H 35 //按钮高度
+#define kMaxHeight 80 //输入视图最大高度
+#define kMinHeight (kItem_H+kPanding*2)// 输入视图最小高度
 @interface YGInputView ()<UITextViewDelegate>
 {
     
@@ -38,6 +40,15 @@
         self.backgroundColor=[UIColor colorWithRed:0.949 green:0.949 blue:0.961 alpha:1.000];
     }
     return self;
+}
+
+-(void)setFrame:(CGRect)frame
+{
+    if(frame.size.height>kMaxHeight)
+        frame.size.height=kMaxHeight;
+    else if (frame.size.height<kMinHeight)
+        frame.size.height=kMinHeight;
+    [super setFrame:frame];
 }
 
 #pragma mark 创建子控件
@@ -86,27 +97,29 @@
 -(void)layoutSubviews
 {
     [super layoutSubviews];
-    self.tfcontent.frame=CGRectMake(kMarginleft+kItem_H+kPanding, 5, kSELF_SIZE.width-(kMarginleft*2+kPanding*3+kItem_H*3), kItem_H);
-    self.btnvoice.frame=CGRectMake(kMarginleft, 5, kItem_H, kItem_H);
-    self.btnexpression.frame=CGRectMake(CGRectGetMaxX(self.tfcontent.frame)+kPanding, 5, kItem_H, kItem_H);
-    self.btnextend.frame=CGRectMake(CGRectGetMaxX(self.btnexpression.frame)+kPanding, 5, kItem_H, kItem_H);
+
+    self.tfcontent.frame=CGRectMake(kMarginleft+kItem_H+kPanding, 5, kSELF_SIZE.width-(kMarginleft*2+kPanding*3+kItem_H*3), kSELF_SIZE.height-kPanding*2);
+    CGFloat item_y=kSELF_SIZE.height-kPanding-kItem_H;
+    self.btnvoice.frame=CGRectMake(kMarginleft, item_y, kItem_H, kItem_H);
+    self.btnexpression.frame=CGRectMake(CGRectGetMaxX(self.tfcontent.frame)+kPanding, item_y, kItem_H, kItem_H);
+    self.btnextend.frame=CGRectMake(CGRectGetMaxX(self.btnexpression.frame)+kPanding, item_y, kItem_H, kItem_H);
 }
 
 -(void)textViewDidChange:(UITextView *)textView
 {
-    if(textView.text)
+    //获取文字高度
+    CGFloat textheight=[[textView layoutManager]usedRectForTextContainer:[textView textContainer]].size.height+8;
+    CGRect selfframe=self.frame;
+    CGFloat viewheight=textheight+kPanding*2;
+    if(viewheight>kMaxHeight)
+        viewheight=kMaxHeight;
+    else if (viewheight<kMinHeight)
+        viewheight=kMinHeight;
+    selfframe.size.height=viewheight;
+    self.frame=selfframe;
+    if(self.delegate&&[self.delegate respondsToSelector:@selector(inputViewHeightChange:height:)])
     {
-        CGRect textFrame=[[textView layoutManager]usedRectForTextContainer:[textView textContainer]];
-        CGFloat textheight=textFrame.size.height+8;
-        CGRect frame=self.tfcontent.frame;
-        frame.size.height=textheight;
-        self.tfcontent.frame=frame;
-        CGRect selfframe=self.frame;
-        selfframe.size.height=60;
-        self.frame=selfframe;
-        self.heightChange(60);
-        [self layoutIfNeeded];
-        NSLog(@"%@",NSStringFromCGRect(self.frame));
+        [self.delegate inputViewHeightChange:self height:viewheight];
     }
 }
 

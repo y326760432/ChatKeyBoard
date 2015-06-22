@@ -9,7 +9,7 @@
 #import "YGMessageController.h"
 #import "YGGlobalHeader.h"
 #import "YGInputView.h"
-@interface YGMessageController ()<UITableViewDataSource,UITableViewDelegate>
+@interface YGMessageController ()<UITableViewDataSource,UITableViewDelegate,YGInputViewDelegate>
 {
     
 }
@@ -35,15 +35,11 @@
 #pragma mark 监听键盘即将出现通知
 -(void)keyBoardChangeFrame:(NSNotification *)notification
 {
-    NSLog(@"%@",notification.userInfo);
     //获取动画时长
     CGFloat duration=[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
     //获取键盘高度
     CGFloat keyborad_y=[notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].origin.y ;
-    
-    
-//    NSLog(@"tableframe%@",NSStringFromCGRect(tableframe));
-//     NSLog(@"inputviewframe%@",NSStringFromCGRect(inputviewframe));
+
     [UIView animateWithDuration:duration animations:^{
         CGRect tableframe=self.tableView.frame;
         CGRect inputviewframe=self.Inputview.frame;
@@ -51,7 +47,6 @@
         self.tableView.frame=tableframe;
         inputviewframe.origin.y=keyborad_y-kKeyBorad_H-64;
         self.Inputview.frame=inputviewframe;
-        NSLog(@"%@",NSStringFromCGRect(inputviewframe));
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForItem:19 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         
     }];
@@ -64,23 +59,37 @@
     self.edgesForExtendedLayout=UIRectEdgeNone;
 }
 
+#pragma mark 添加输入视图
 -(void)addInputView
 {
     YGInputView *view=[[YGInputView alloc]initWithFrame:CGRectMake(0, kSELF_VIEW_SIZE.height-kKeyBorad_H-64, kSELF_VIEW_SIZE.width, kKeyBorad_H)];
-    view.heightChange=^(CGFloat hegiht)
-    {
-        CGRect inputviewframe=self.Inputview.frame;
-        inputviewframe.size.height=hegiht;
-        [self.view layoutSubviews];
-    };
+    view.delegate=self;
     [self.view addSubview:view];
     self.Inputview=view;
     
 }
 
+#pragma mark 输入视图代理方法
+
+#pragma mark 输入视图高度发生改变
+-(void)inputViewHeightChange:(YGInputView *)inputview height:(CGFloat)height
+{
+    
+    CGRect inputviewframe=self.Inputview.frame;
+    
+//    CGFloat height2=inputviewframe.size.height-height;
+//    inputviewframe.size.height=height;
+//    inputviewframe.origin.y+=height2;
+//    
+//    self.Inputview.frame=inputviewframe;
+//    
+//    CGRect tableviewframe=self.tableView.frame;
+//    tableviewframe.origin.y+=height2;
+//    self.tableView.frame=tableviewframe;
+}
+
 
 #pragma mark UITableView代理方法
-
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return 20;
