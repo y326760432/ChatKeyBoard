@@ -115,6 +115,8 @@
         viewheight=kMaxHeight;
     else if (viewheight<kMinHeight)
         viewheight=kMinHeight;
+    
+    selfframe.origin.y-=viewheight-selfframe.size.height;
     selfframe.size.height=viewheight;
     self.frame=selfframe;
     if(self.delegate&&[self.delegate respondsToSelector:@selector(inputViewHeightChange:height:)])

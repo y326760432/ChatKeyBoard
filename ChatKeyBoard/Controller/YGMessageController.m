@@ -43,9 +43,9 @@
     [UIView animateWithDuration:duration animations:^{
         CGRect tableframe=self.tableView.frame;
         CGRect inputviewframe=self.Inputview.frame;
-        tableframe.origin.y=(keyborad_y-kKeyBorad_H-20)-kSELF_VIEW_SIZE.height;
+        tableframe.origin.y=(keyborad_y-inputviewframe.size.height-20)-kSELF_VIEW_SIZE.height;
         self.tableView.frame=tableframe;
-        inputviewframe.origin.y=keyborad_y-kKeyBorad_H-64;
+        inputviewframe.origin.y=keyborad_y-inputviewframe.size.height-64;
         self.Inputview.frame=inputviewframe;
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForItem:19 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         
@@ -74,8 +74,9 @@
 #pragma mark 输入视图高度发生改变
 -(void)inputViewHeightChange:(YGInputView *)inputview height:(CGFloat)height
 {
-    
-    CGRect inputviewframe=self.Inputview.frame;
+    CGRect tabviewfarme=self.tableView.frame;
+    tabviewfarme.origin.y=inputview.frame.origin.y-tabviewfarme.size.height;
+    self.tableView.frame=tabviewfarme;
     
 //    CGFloat height2=inputviewframe.size.height-height;
 //    inputviewframe.size.height=height;
